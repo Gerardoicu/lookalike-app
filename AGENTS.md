@@ -1,15 +1,15 @@
 # Repository Agent Rules
 
-1. Keep this repository the Lookalike Angular, Spring, and PostgreSQL application foundation.
+1. Keep this repository the Lookalike Angular and Spring application foundation.
 2. Preserve `.git/` and never commit or push unless the user explicitly asks.
 3. Do not modify or delete `.idea/`; keep it ignored from the root.
 4. Keep all repository artifacts in English.
 5. Keep root hygiene files authoritative for editor, git, and environment rules.
 6. Do not add nested `.git` directories, nested `AGENTS.md` files, or AI-tool configuration.
 7. Do not add root convenience scripts unless the repository direction changes.
-8. Keep the frontend in `frontend/`, the backend in `backend/`, and local PostgreSQL in root `compose.yaml`.
+8. Keep the frontend in `frontend/` and the backend in `backend/`.
 9. Do not containerize the frontend or backend.
-10. `ARCHITECTURE.md` is the authoritative reference for backend, frontend, API, persistence, database, testing, security-boundary, and clean-code decisions.
+10. `ARCHITECTURE.md` is the authoritative reference for backend, frontend, API, testing, security-boundary, and clean-code decisions.
 11. Keep this file operational and concise; do not duplicate the architecture manual here.
 
 ## Task Lifecycle
@@ -69,17 +69,16 @@
 ## Product Identity
 
 - Product identity was initialized by `PROJECT-001: Initialize product identity`.
-- Keep product, Java, Maven, Angular, local database, and documentation identity aligned with Lookalike.
+- Keep product, Java, Maven, Angular, and documentation identity aligned with Lookalike.
 - The product slug is `lookalike-app`.
 - The Java group and base package are `com.gerardoicu.lookalike`.
 - The backend Maven artifact is `lookalike-backend`.
 - The Angular application identifier is `lookalike-web`.
-- The local PostgreSQL database identifier is `lookalike`.
 - Do not reintroduce template-only first-use instructions or initialization issue templates.
 
 ## Implementation Rules
 
-51. Follow `ARCHITECTURE.md` for layer ownership, API contracts, persistence, database, Angular, testing, controlled-value, Lombok, JPA metamodel, and clean-code decisions.
+51. Follow `ARCHITECTURE.md` for layer ownership, API contracts, Angular, testing, controlled-value, and clean-code decisions.
 52. Use Angular CLI and Angular Core `22.1.x`.
 53. Use Angular Material `22.1.0`.
 54. Keep TypeScript strict.
@@ -90,36 +89,25 @@
 59. Use the JDK exposed through `JAVA_HOME` and `PATH`; do not search for or hardcode workstation-specific JDK paths.
 60. Run Maven Wrapper commands from `backend/`, where `pom.xml` is located.
 61. Retain `backend/.mvn/wrapper/maven-wrapper.properties`, `backend/mvnw`, and `backend/mvnw.cmd`.
-62. Do not add Actuator, H2, Testcontainers, mapping libraries, code generators, speculative infrastructure, or other dependencies without an approved gated plan.
+62. Do not add Actuator, databases, caches, session stores, authentication frameworks, Testcontainers, mapping libraries, code generators, speculative infrastructure, or other dependencies without an approved gated plan.
 63. Keep `GET /api/v1/health` public and simple.
 64. Do not add a service for health unless it gains business behavior.
-65. Keep controller tests as MVC-slice tests when PostgreSQL is not needed.
-66. Do not keep generated full-context tests that require a database.
+65. Keep controller tests as MVC-slice tests unless full application startup is required.
+66. Do not keep generated full-context tests without a concrete assertion.
 
-## Database And Local Environment
+## Local Environment
 
-67. Keep `spring.jpa.hibernate.ddl-auto=validate`.
-68. Keep `spring.jpa.open-in-view=false`.
-69. Treat Flyway as the only schema-change authority.
-70. Put migrations under `backend/src/main/resources/db/migration/`.
-71. Use safe local-development defaults for datasource properties.
-72. Allow datasource settings to be overridden by environment variables.
-73. Keep `.env.example` safe for local development and never store production credentials.
-74. Ignore `.env`.
-75. Use PostgreSQL service name `db` in Compose.
-76. Use the `postgres:18.4-alpine` image unless intentionally upgraded.
-77. Mount PostgreSQL storage at `/var/lib/postgresql`.
-78. Do not change Compose to a PostgreSQL legacy data subdirectory mount.
-79. Expose local PostgreSQL on port `5432`.
-80. Keep Compose values environment-overridable.
+67. Do not require local databases, caches, authentication secrets, or service containers unless an approved ticket adds them.
+68. Keep local environment documentation current and free of real credentials.
+69. Ignore `.env`.
 
 ## Documentation And Completion
 
-81. Keep README commands current for Windows, macOS, and Linux.
-82. Keep `ARCHITECTURE.md` limited to current boundaries, dependency direction, and approved conventions.
-83. Keep issue templates focused on approved requirement fields and the gated-plan notice.
-84. Keep pull request notes focused on behavior, verification, risk, and gate compliance.
-85. Remove unused code and dependencies when a slice is removed.
-86. Validate with the documented checks before declaring implementation complete.
-87. Keep CI cloud-provider-neutral, least-privilege, pinned to full action SHAs, and validation-only until deployment is approved.
-88. Keep this file at or below 200 lines by consolidating rules rather than appending duplicates.
+70. Keep README commands current for Windows, macOS, and Linux.
+71. Keep `ARCHITECTURE.md` limited to current boundaries, dependency direction, and approved conventions.
+72. Keep issue templates focused on approved requirement fields and the gated-plan notice.
+73. Keep pull request notes focused on behavior, verification, risk, and gate compliance.
+74. Remove unused code and dependencies when a slice is removed.
+75. Validate with the documented checks before declaring implementation complete.
+76. Keep CI cloud-provider-neutral, least-privilege, pinned to full action SHAs, and validation-only until deployment is approved.
+77. Keep this file at or below 200 lines by consolidating rules rather than appending duplicates.
