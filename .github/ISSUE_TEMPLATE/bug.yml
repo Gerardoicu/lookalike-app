@@ -1,0 +1,43 @@
+name: Bug
+description: Report incorrect behavior.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "This Issue defines requirements and scope. Gated impacts require a separately reviewed plan, and implementation begins only after the approval protocol in AGENTS.md."
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Describe who is affected and how severe the problem is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: Provide exact steps, inputs, and environment details.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: Describe the correct behavior or business rule.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add logs, screenshots, responses, or other proof.
+    validations:
+      required: false
+  - type: textarea
+    id: regression
+    attributes:
+      label: Regression
+      description: State whether this worked before and when it changed.
+    validations:
+      required: true

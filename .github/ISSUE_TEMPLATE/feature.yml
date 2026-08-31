@@ -1,0 +1,43 @@
+name: Feature
+description: Propose a feature or business capability.
+title: "[Feature]: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: "This Issue defines requirements and scope. Gated impacts require a separately reviewed plan, and implementation begins only after the approval protocol in AGENTS.md."
+  - type: textarea
+    id: business-rule
+    attributes:
+      label: Business rule
+      description: Describe the rule or workflow the system must support.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance criteria
+      description: List observable outcomes that prove the feature is complete.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Describe who is affected and what changes for them.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Add links, screenshots, examples, or source material.
+    validations:
+      required: false
+  - type: textarea
+    id: regression-risk
+    attributes:
+      label: Regression risk
+      description: Describe existing behavior that must not change.
+    validations:
+      required: true

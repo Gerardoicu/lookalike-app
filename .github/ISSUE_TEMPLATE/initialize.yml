@@ -1,0 +1,88 @@
+name: Initialize project
+description: Use exactly once after creating a repository from this template.
+title: "PROJECT-001: "
+body:
+  - type: markdown
+    attributes:
+      value: "This Issue defines requirements and scope. Gated impacts require a separately reviewed plan, and implementation begins only after the approval protocol in AGENTS.md."
+  - type: input
+    id: product-name
+    attributes:
+      label: Product name
+      description: Provide the human-readable product name.
+    validations:
+      required: true
+  - type: input
+    id: project-slug
+    attributes:
+      label: Project slug
+      description: Provide the repository or project slug.
+    validations:
+      required: true
+  - type: textarea
+    id: purpose
+    attributes:
+      label: Product purpose
+      description: State the product purpose in one concise paragraph.
+    validations:
+      required: true
+  - type: textarea
+    id: actors
+    attributes:
+      label: Primary actors
+      description: List the people or systems that will use the product.
+    validations:
+      required: true
+  - type: input
+    id: java-package
+    attributes:
+      label: Java group and base package
+      description: Optional. Leave blank when Codex should propose it from the product identity.
+    validations:
+      required: false
+  - type: input
+    id: backend-artifact
+    attributes:
+      label: Backend artifact identifier
+      description: Optional. Leave blank when Codex should derive it.
+    validations:
+      required: false
+  - type: input
+    id: angular-app
+    attributes:
+      label: Angular application identifier
+      description: Optional. Leave blank when Codex should derive it.
+    validations:
+      required: false
+  - type: input
+    id: postgres-database
+    attributes:
+      label: Local PostgreSQL database identifier
+      description: Optional. Leave blank when Codex should derive it.
+    validations:
+      required: false
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Product constraints
+      description: List naming, compliance, platform, or organizational constraints.
+    validations:
+      required: false
+  - type: textarea
+    id: exclusions
+    attributes:
+      label: Initialization exclusions
+      description: List anything that must not be included in initialization.
+    validations:
+      required: true
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: No real credentials or secrets are included.
+          required: true
+        - label: Initialization contains no business modules, entities, tables, roles, or speculative architecture.
+          required: true
+        - label: Business development starts only after initialization is merged and CI passes.
+          required: true
