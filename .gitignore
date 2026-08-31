@@ -21,5 +21,6 @@ frontend/__screenshots__/
 backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
 backend/HELP.md
+backend/src/test/resources/ai-001/local/
 
 *.log
