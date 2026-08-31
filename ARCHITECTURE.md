@@ -1,13 +1,13 @@
 # Architecture
 
-This repository is a reusable Angular, Spring, and PostgreSQL foundation. This
+This repository is the Lookalike Angular, Spring, and PostgreSQL foundation. This
 document is the authority for backend, frontend, API, persistence, database,
 testing, and clean-code decisions. `AGENTS.md` remains the operational policy
 for agents and points here for cross-cutting design rules.
 
 ## Purpose And Boundaries
 
-The foundation has three local boundaries:
+Lookalike has three local boundaries:
 
 - `frontend/`: standalone Angular application with Angular Material, routing,
   and typed authentication infrastructure.
@@ -16,9 +16,10 @@ The foundation has three local boundaries:
 - `compose.yaml`: local PostgreSQL dependency for development and integration
   checks.
 
-The foundation currently has no business domain. It exposes public health,
-authentication endpoints, current-user identity, and an admin check for
-authorization verification.
+Lookalike is a public entertainment web application where anonymous visitors
+compare one photo against configured personality profiles. The repository
+currently exposes public health, authentication endpoints, current-user
+identity, and an admin check for authorization verification.
 
 Do not add business modules, entities, tables, roles, production infrastructure,
 or speculative architecture outside an approved ticket.

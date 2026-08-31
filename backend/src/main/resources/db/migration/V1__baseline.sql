@@ -1,1 +1,1 @@
--- Baseline migration for the reusable application foundation.
+-- Baseline migration for the Lookalike application foundation.
