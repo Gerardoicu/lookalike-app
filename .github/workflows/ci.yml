@@ -52,27 +52,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
-    services:
-      postgres:
-        image: postgres:18.4-alpine
-        env:
-          POSTGRES_DB: lookalike_ci
-          POSTGRES_USER: lookalike_ci
-          POSTGRES_PASSWORD: lookalike_ci
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U lookalike_ci -d lookalike_ci"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      APP_DATASOURCE_URL: jdbc:postgresql://localhost:5432/lookalike_ci
-      APP_DATASOURCE_USERNAME: lookalike_ci
-      APP_DATASOURCE_PASSWORD: lookalike_ci
-      APP_AUTH_JWT_SECRET: ci-only-jwt-secret-not-for-real-use-0001
-
     steps:
       - name: Check out repository
         # actions/checkout v7.0.1
@@ -89,4 +68,4 @@ jobs:
 
       - name: Run backend verification
         working-directory: backend
-        run: ./mvnw verify -Pintegration
+        run: ./mvnw verify

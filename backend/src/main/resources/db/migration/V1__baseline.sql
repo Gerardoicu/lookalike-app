@@ -1,1 +1,0 @@
--- Baseline migration for the Lookalike application foundation.
