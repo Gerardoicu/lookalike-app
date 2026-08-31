@@ -32,12 +32,39 @@ Runtime dependency direction is one-way:
 
 ## Security Boundaries
 
-Lookalike is currently anonymous and has no protected backend resources. Public
-access must remain deliberate. `GET /api/v1/health` is public and simple.
+Lookalike is anonymous and has no accounts, login, roles, or protected user
+resources. Public access must remain deliberate. `GET /api/v1/health` is public
+and simple.
 
-Do not add authentication, authorization, tokens, roles, cookie-backed security
-flows, or protected resources without an approved ticket that establishes a
-concrete security boundary.
+Anonymous analysis requests use a reusable anti-abuse boundary before expensive
+work executes:
+
+1. Request-size precheck.
+2. Signed visitor cookie validation.
+3. In-memory fixed-window burst rate limit.
+4. Ten-minute cooldown check.
+5. Cloudflare Turnstile token verification.
+6. Feature-owned request validation and AI inference.
+
+The signed visitor cookie is the source of truth for the cooldown. It contains a
+generated visitor id and the timestamp of the last successful analysis, signed
+with HMAC-SHA256. Passing Turnstile alone must not start the cooldown; feature
+controllers record a successful analysis only after the feature work completes.
+
+Rate limiting is in-memory and keyed by a validated visitor id when available,
+or by the servlet remote address when no valid visitor cookie exists. Arbitrary
+forwarded-IP headers are not trusted. Cloudflare proxy header trust is a later
+deployment concern.
+
+Cloudflare Turnstile is rendered explicitly in the Angular SPA. The backend is
+the only caller of Siteverify and validates success, configured hostnames,
+configured action, missing or oversized tokens, invalid tokens, and
+`timeout-or-duplicate` responses. Turnstile secrets and cookie signing secrets
+are external configuration and must not be committed.
+
+Do not add authentication, authorization, accounts, sessions, persistent visitor
+records, browser fingerprinting, or protected resources without an approved
+ticket that establishes a concrete security boundary.
 
 ## Backend Layer Ownership
 
