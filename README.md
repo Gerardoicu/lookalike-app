@@ -87,6 +87,35 @@ current scope.
 
 `GET /api/v1/health` is public and returns the backend health status.
 
+## Anonymous security configuration
+
+Lookalike uses reusable anonymous anti-abuse controls for future analysis
+requests. The current application can still start and serve health without real
+Cloudflare credentials. Guarded analysis flows fail closed if required secrets
+are missing.
+
+Safe local defaults are configured in `backend/src/main/resources/application.properties`.
+Override these values with environment variables when a protected analysis flow
+is enabled:
+
+- `LOOKALIKE_TURNSTILE_SECRET_KEY`
+- `LOOKALIKE_TURNSTILE_EXPECTED_HOSTNAMES`
+- `LOOKALIKE_TURNSTILE_EXPECTED_ACTION`
+- `LOOKALIKE_VISITOR_COOKIE_SIGNING_SECRET`
+- `LOOKALIKE_VISITOR_COOKIE_SECURE`
+- `LOOKALIKE_VISITOR_COOKIE_MAX_AGE`
+- `LOOKALIKE_ANALYSIS_COOLDOWN`
+- `LOOKALIKE_RATE_LIMIT_CAPACITY`
+- `LOOKALIKE_RATE_LIMIT_WINDOW`
+- `LOOKALIKE_RATE_LIMIT_CLEANUP_INTERVAL`
+- `LOOKALIKE_MAX_KNOWN_CONTENT_LENGTH_BYTES`
+- `LOOKALIKE_MAX_UPLOAD_SIZE`
+- `LOOKALIKE_MAX_REQUEST_SIZE`
+
+Do not commit real secret values. Cloudflare Turnstile site keys are public
+client configuration; Turnstile secret keys and visitor-cookie signing secrets
+must remain backend-only.
+
 ## Test
 
 Frontend unit tests.
