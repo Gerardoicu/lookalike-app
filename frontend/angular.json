@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "frontend": {
+    "lookalike-web": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -62,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "frontend:build:production"
+              "buildTarget": "lookalike-web:build:production"
             },
             "development": {
-              "buildTarget": "frontend:build:development",
+              "buildTarget": "lookalike-web:build:development",
               "proxyConfig": "proxy.conf.json"
             }
           },

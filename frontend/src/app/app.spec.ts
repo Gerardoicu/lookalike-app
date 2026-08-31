@@ -13,9 +13,7 @@ describe('App', () => {
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
 
-    expect(compiled.querySelector('mat-toolbar')?.textContent).toContain('Application Foundation');
-    expect(compiled.querySelector('h1')?.textContent).toContain(
-      'Angular Spring PostgreSQL Foundation'
-    );
+    expect(compiled.querySelector('mat-toolbar')?.textContent).toContain('Lookalike');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Lookalike');
   });
 });

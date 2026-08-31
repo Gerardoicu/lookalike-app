@@ -8,11 +8,11 @@
 		<version>4.1.0</version>
 		<relativePath/>
 	</parent>
-	<groupId>com.example</groupId>
-	<artifactId>backend</artifactId>
+	<groupId>com.gerardoicu.lookalike</groupId>
+	<artifactId>lookalike-backend</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>backend</name>
-	<description>Reusable Angular, Spring, and PostgreSQL foundation backend</description>
+	<name>lookalike-backend</name>
+	<description>Lookalike backend</description>
 	<properties>
 		<java.version>25</java.version>
 	</properties>

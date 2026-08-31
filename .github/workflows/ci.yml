@@ -56,21 +56,21 @@ jobs:
       postgres:
         image: postgres:18.4-alpine
         env:
-          POSTGRES_DB: app_foundation_ci
-          POSTGRES_USER: app_foundation_ci
-          POSTGRES_PASSWORD: app_foundation_ci
+          POSTGRES_DB: lookalike_ci
+          POSTGRES_USER: lookalike_ci
+          POSTGRES_PASSWORD: lookalike_ci
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U app_foundation_ci -d app_foundation_ci"
+          --health-cmd "pg_isready -U lookalike_ci -d lookalike_ci"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
 
     env:
-      APP_DATASOURCE_URL: jdbc:postgresql://localhost:5432/app_foundation_ci
-      APP_DATASOURCE_USERNAME: app_foundation_ci
-      APP_DATASOURCE_PASSWORD: app_foundation_ci
+      APP_DATASOURCE_URL: jdbc:postgresql://localhost:5432/lookalike_ci
+      APP_DATASOURCE_USERNAME: lookalike_ci
+      APP_DATASOURCE_PASSWORD: lookalike_ci
       APP_AUTH_JWT_SECRET: ci-only-jwt-secret-not-for-real-use-0001
 
     steps:

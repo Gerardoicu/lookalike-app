@@ -1,6 +1,6 @@
 # Repository Agent Rules
 
-1. Keep this repository a reusable Angular, Spring, and PostgreSQL foundation.
+1. Keep this repository the Lookalike Angular, Spring, and PostgreSQL application foundation.
 2. Preserve `.git/` and never commit or push unless the user explicitly asks.
 3. Do not modify or delete `.idea/`; keep it ignored from the root.
 4. Keep all repository artifacts in English.
@@ -66,17 +66,16 @@
 49. Never implement a ticket directly on `main`.
 50. If `main` is dirty before a new ticket, stop instead of stashing, resetting, or moving unrelated work automatically.
 
-## Project Initialization Gate
+## Product Identity
 
-- While template placeholder identity remains, business feature implementation is blocked.
-- The first product task must be `PROJECT-001: Initialize product identity`, created through the initialization Issue form.
-- The first turn is plan-only, and implementation requires exactly `APPROVE PLAN: PROJECT-001`.
-- Initialization occurs on `initialization/001-product-identity`.
-- Permitted initialization changes are product identity, Java, Maven, and Angular identifiers, local database identifiers, directly affected current documentation, and identity-specific rules already present in `AGENTS.md`.
-- Initialization must remove the one-time issue form and template-only first-use instructions from the generated product.
-- Initialization must not add business modules, entities, tables, roles, dependencies, deployment infrastructure, or speculative architecture.
-- Business work starts only after initialization is merged and CI passes.
-- Reusable-template maintenance remains allowed when the task explicitly targets the generic foundation rather than a product feature.
+- Product identity was initialized by `PROJECT-001: Initialize product identity`.
+- Keep product, Java, Maven, Angular, local database, and documentation identity aligned with Lookalike.
+- The product slug is `lookalike-app`.
+- The Java group and base package are `com.gerardoicu.lookalike`.
+- The backend Maven artifact is `lookalike-backend`.
+- The Angular application identifier is `lookalike-web`.
+- The local PostgreSQL database identifier is `lookalike`.
+- Do not reintroduce template-only first-use instructions or initialization issue templates.
 
 ## Implementation Rules
 
@@ -86,7 +85,7 @@
 54. Keep TypeScript strict.
 55. Do not add frontend libraries beyond Angular, Angular Material, RxJS, and test/build tooling without an approved gated plan.
 56. Use Java 25 and Spring Boot `4.1.0`.
-57. Keep the Maven artifact `backend`, group `com.example`, and base package `com.example.foundation`.
+57. Keep the Maven artifact `lookalike-backend`, group `com.gerardoicu.lookalike`, and base package `com.gerardoicu.lookalike`.
 58. Use the Maven Wrapper from `backend/` for Maven commands.
 59. Use the JDK exposed through `JAVA_HOME` and `PATH`; do not search for or hardcode workstation-specific JDK paths.
 60. Run Maven Wrapper commands from `backend/`, where `pom.xml` is located.

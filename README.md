@@ -1,7 +1,7 @@
-# Angular Spring PostgreSQL Foundation
+# Lookalike
 
-Reusable starter for a standalone Angular application, a Spring Boot backend,
-and local PostgreSQL.
+Lookalike is a public entertainment web application where anonymous visitors
+compare one photo against configured personality profiles.
 
 ## Prerequisites
 
@@ -116,8 +116,8 @@ Backend health: `http://localhost:8080/api/v1/health`
 In local development, Angular uses `frontend/proxy.conf.json` to send relative
 `/api/v1` requests from `http://localhost:4200` to the backend on
 `http://localhost:8080`. Production is expected to use same-origin
-frontend/backend deployment; cross-origin production deployment is outside this
-foundation.
+frontend/backend deployment; cross-origin production deployment is outside the
+current scope.
 
 Authentication endpoints:
 
@@ -244,62 +244,17 @@ CI-only database values, sets a non-production CI-only JWT value, and runs
 the Failsafe `RefreshSessionIT`, Flyway migrations from an empty PostgreSQL
 database, and Hibernate schema validation.
 
-GitHub Template repositories do not copy branch-protection settings. Configure
-the required `frontend` and `backend` checks after creating a repository from
-this template.
-
 Stop local PostgreSQL without deleting the named volume:
 
 ```sh
 docker compose down
 ```
 
-## First use
+## Product identity
 
-Use this foundation once to initialize a product identity before business work
-begins:
-
-1. Create a repository using GitHub `Use this template`.
-2. Clone the generated repository.
-3. Create the first Issue using `Initialize project`.
-4. Complete it as `PROJECT-001: Initialize product identity`.
-5. Open Codex in Plan mode.
-6. Paste the Issue URL into the bootstrap prompt below.
-7. Review the plan.
-8. Approve only with `APPROVE PLAN: PROJECT-001`.
-9. Implement on `initialization/001-product-identity`.
-10. Merge only after CI passes.
-11. Begin business tickets only after initialization is complete.
-
-Copy-ready Codex bootstrap prompt:
-
-```text
-Plan PROJECT-001 from this Issue: <paste Issue URL>
-
-Read root AGENTS.md first. Treat the Issue as authoritative scope, but not as
-authorization to implement. This first turn is plan-only. Use one agent.
-
-Inspect only current identity files and their direct dependencies. Classify the
-exact before/after identity mappings for product display name and purpose,
-repository/project slug, Java group, base package, package directories, imports,
-tests, Maven coordinates, Angular workspace/application identity and visible
-title, local PostgreSQL defaults, and directly affected README, architecture,
-and agent rules.
-
-Retain the top-level frontend/ and backend/ directories. Preserve /api/v1,
-authentication behavior, roles, schema, Flyway history, dependencies, CI, and
-framework versions unless the initialization Issue explicitly introduces a
-separately approved gate.
-
-Exclude business modules, entities, tables, sample domain features, production
-infrastructure, and speculative abstractions. Propose focused validation.
-Finish with NOT AUTHORIZED TO IMPLEMENT.
-```
-
-Approved initialization implementation must also remove
-`.github/ISSUE_TEMPLATE/initialize.yml` from the generated product repository
-after the initialization Issue exists, replace this template-specific section
-with the product's actual identity and purpose, replace or remove
-template-only initialization rules from `AGENTS.md`, update `ARCHITECTURE.md`
-only with the initialized current state, and preserve the created Issue and
-merged Pull Request as the durable initialization history.
+- Product name: `Lookalike`
+- Project slug: `lookalike-app`
+- Backend artifact: `lookalike-backend`
+- Java group and base package: `com.gerardoicu.lookalike`
+- Angular application identifier: `lookalike-web`
+- Local PostgreSQL database identifier: `lookalike`
