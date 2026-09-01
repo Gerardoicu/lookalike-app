@@ -15,7 +15,7 @@ Lookalike has three local boundaries:
 
 Lookalike is a public entertainment web application where anonymous visitors
 compare one photo against configured personality profiles. The repository
-currently exposes public health only.
+currently exposes public health and a guarded single-photo facial-analysis API.
 
 Do not add business modules, databases, caches, server-side sessions,
 authentication frameworks, roles, production infrastructure, or speculative
@@ -36,15 +36,19 @@ Lookalike is anonymous and has no accounts, login, roles, or protected user
 resources. Public access must remain deliberate. `GET /api/v1/health` is public
 and simple.
 
-Anonymous analysis requests use a reusable anti-abuse boundary before expensive
-work executes:
+Anonymous analysis requests use a reusable anti-abuse boundary before
+application validation and AI inference execute. Spring MVC may parse multipart
+requests before controller methods run, so multipart work is bounded by servlet
+request limits and an in-memory multipart threshold.
 
 1. Request-size precheck.
-2. Signed visitor cookie validation.
-3. In-memory fixed-window burst rate limit.
-4. Ten-minute cooldown check.
-5. Cloudflare Turnstile token verification.
-6. Feature-owned request validation and AI inference.
+2. Servlet multipart parsing and buffering when the request is multipart.
+3. Required security configuration validation.
+4. Signed visitor cookie validation.
+5. In-memory fixed-window burst rate limit.
+6. Ten-minute cooldown check.
+7. Cloudflare Turnstile token verification.
+8. Feature-owned request validation and AI inference.
 
 The signed visitor cookie is the source of truth for the cooldown. It contains a
 generated visitor id and the timestamp of the last successful analysis, signed
@@ -61,6 +65,18 @@ the only caller of Siteverify and validates success, configured hostnames,
 configured action, missing or oversized tokens, invalid tokens, and
 `timeout-or-duplicate` responses. Turnstile secrets and cookie signing secrets
 are external configuration and must not be committed.
+
+Uploaded photographs are transient request data. Do not persist them to
+databases, filesystem storage, application-owned temporary storage, object
+storage, logs, or analysis history. Facial representations remain backend
+internal unless an approved API contract explicitly exposes them.
+
+The FACE-001 backend accepts JPEG only, checks bounded bytes and JPEG metadata
+with memory-backed inspection before OpenCV decode, enforces configured
+dimension and pixel limits, requires exactly one usable face, and extracts a
+transient SFace embedding. OpenCV and ONNX Runtime model objects are initialized
+lazily and reused in-process; health-only startup must still work when model
+files are absent.
 
 Do not add authentication, authorization, accounts, sessions, persistent visitor
 records, browser fingerprinting, or protected resources without an approved
