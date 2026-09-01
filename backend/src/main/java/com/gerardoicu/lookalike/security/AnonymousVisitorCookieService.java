@@ -1,6 +1,7 @@
 package com.gerardoicu.lookalike.security;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Arrays;
@@ -45,6 +46,7 @@ public class AnonymousVisitorCookieService {
 	}
 
 	VisitorCookieValidation validate(HttpServletRequest request) {
+		ensureSigningConfigured();
 		return findCookieValue(request)
 			.map(this::validate)
 			.orElseGet(VisitorCookieValidation::missing);
@@ -64,13 +66,6 @@ public class AnonymousVisitorCookieService {
 	}
 
 	private VisitorCookieValidation validate(String cookieValue) {
-		if (properties.visitorCookie().signingSecret().isBlank()) {
-			throw new SecurityException(
-					ErrorCode.SECURITY_COOKIE_TAMPERED,
-					HttpStatus.SERVICE_UNAVAILABLE,
-					"Visitor cookie signing is not configured."
-			);
-		}
 		String[] parts = cookieValue.split("\\" + DELIMITER, -1);
 		if (parts.length != 2) {
 			return VisitorCookieValidation.invalidSignature();
@@ -83,7 +78,7 @@ public class AnonymousVisitorCookieService {
 		catch (IllegalArgumentException ex) {
 			return VisitorCookieValidation.invalidSignature();
 		}
-		if (!Arrays.equals(expectedSignature, actualSignature)) {
+		if (!MessageDigest.isEqual(expectedSignature, actualSignature)) {
 			return VisitorCookieValidation.invalidSignature();
 		}
 		try {
@@ -104,13 +99,7 @@ public class AnonymousVisitorCookieService {
 	}
 
 	private String encode(AnonymousVisitorCookie visitorCookie) {
-		if (properties.visitorCookie().signingSecret().isBlank()) {
-			throw new SecurityException(
-					ErrorCode.SECURITY_COOKIE_TAMPERED,
-					HttpStatus.SERVICE_UNAVAILABLE,
-					"Visitor cookie signing is not configured."
-			);
-		}
+		ensureSigningConfigured();
 		String lastSuccessfulAt = visitorCookie.lastSuccessfulAnalysisAt()
 			.map(Instant::toEpochMilli)
 			.map(String::valueOf)
@@ -151,5 +140,15 @@ public class AnonymousVisitorCookieService {
 			.filter(cookie -> COOKIE_NAME.equals(cookie.getName()))
 			.findFirst()
 			.map(Cookie::getValue);
+	}
+
+	private void ensureSigningConfigured() {
+		if (properties.visitorCookie().signingSecret().isBlank()) {
+			throw new SecurityException(
+					ErrorCode.SECURITY_CONFIGURATION_UNAVAILABLE,
+					HttpStatus.SERVICE_UNAVAILABLE,
+					"Visitor cookie signing is not configured."
+			);
+		}
 	}
 }

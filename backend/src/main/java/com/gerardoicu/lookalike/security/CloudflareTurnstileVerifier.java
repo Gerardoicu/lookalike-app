@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.gerardoicu.lookalike.api.ErrorCode;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,10 @@ class CloudflareTurnstileVerifier implements TurnstileVerifier {
 
 	CloudflareTurnstileVerifier(SecurityProperties properties, RestClient.Builder restClientBuilder) {
 		this.properties = properties;
-		this.restClient = restClientBuilder.baseUrl(SITEVERIFY_URL).build();
+		this.restClient = restClientBuilder
+			.baseUrl(SITEVERIFY_URL)
+			.requestFactory(siteverifyRequestFactory(properties))
+			.build();
 	}
 
 	@Override
@@ -63,6 +67,13 @@ class CloudflareTurnstileVerifier implements TurnstileVerifier {
 				HttpStatus.SERVICE_UNAVAILABLE,
 				"Turnstile verification is unavailable."
 		);
+	}
+
+	private static SimpleClientHttpRequestFactory siteverifyRequestFactory(SecurityProperties properties) {
+		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+		requestFactory.setConnectTimeout(properties.siteverify().connectTimeout());
+		requestFactory.setReadTimeout(properties.siteverify().readTimeout());
+		return requestFactory;
 	}
 
 	private record SiteverifyResponse(

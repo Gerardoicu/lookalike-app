@@ -48,6 +48,7 @@ public class AnonymousAnalysisSecurityGate {
 	}
 
 	public AnonymousAnalysisAuthorization authorizePreAnalysis(HttpServletRequest request, HttpServletResponse response, String turnstileToken) {
+		validateRequiredSecurityConfiguration();
 		VisitorCookieValidation cookieValidation = visitorCookieService.validate(request);
 		if (cookieValidation.tampered()) {
 			visitorCookieService.clearCookie(response);
@@ -87,6 +88,23 @@ public class AnonymousAnalysisSecurityGate {
 				);
 			}
 		});
+	}
+
+	private void validateRequiredSecurityConfiguration() {
+		if (properties.visitorCookie().signingSecret().isBlank()) {
+			throw new SecurityException(
+					ErrorCode.SECURITY_CONFIGURATION_UNAVAILABLE,
+					HttpStatus.SERVICE_UNAVAILABLE,
+					"Visitor cookie signing is not configured."
+			);
+		}
+		if (properties.turnstile().expectedHostnames().isEmpty()) {
+			throw new SecurityException(
+					ErrorCode.SECURITY_CONFIGURATION_UNAVAILABLE,
+					HttpStatus.SERVICE_UNAVAILABLE,
+					"Turnstile expected hostname is not configured."
+			);
+		}
 	}
 
 	private void validateTurnstileTokenShape(String token) {
