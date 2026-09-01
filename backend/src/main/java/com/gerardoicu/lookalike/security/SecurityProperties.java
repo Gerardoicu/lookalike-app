@@ -10,7 +10,8 @@ public record SecurityProperties(
 		Turnstile turnstile,
 		VisitorCookie visitorCookie,
 		RateLimit rateLimit,
-		RequestLimit requestLimit
+		RequestLimit requestLimit,
+		Siteverify siteverify
 ) {
 
 	public SecurityProperties {
@@ -18,6 +19,7 @@ public record SecurityProperties(
 		visitorCookie = visitorCookie == null ? new VisitorCookie("", false, Duration.ofDays(30), Duration.ofMinutes(10)) : visitorCookie;
 		rateLimit = rateLimit == null ? new RateLimit(20, Duration.ofMinutes(1), Duration.ofMinutes(5)) : rateLimit;
 		requestLimit = requestLimit == null ? new RequestLimit(2_097_152L) : requestLimit;
+		siteverify = siteverify == null ? new Siteverify(Duration.ofSeconds(2), Duration.ofSeconds(5)) : siteverify;
 	}
 
 	public record Turnstile(String secretKey, List<String> expectedHostnames, String expectedAction) {
@@ -49,5 +51,13 @@ public record SecurityProperties(
 	}
 
 	public record RequestLimit(long maxKnownContentLengthBytes) {
+	}
+
+	public record Siteverify(Duration connectTimeout, Duration readTimeout) {
+
+		public Siteverify {
+			connectTimeout = connectTimeout == null ? Duration.ofSeconds(2) : connectTimeout;
+			readTimeout = readTimeout == null ? Duration.ofSeconds(5) : readTimeout;
+		}
 	}
 }
