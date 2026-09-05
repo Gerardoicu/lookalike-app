@@ -15,7 +15,8 @@ Lookalike has three local boundaries:
 
 Lookalike is a public entertainment web application where anonymous visitors
 compare one photo against configured personality profiles. The repository
-currently exposes public health and a guarded single-photo facial-analysis API.
+currently exposes public health and a guarded single-photo facial-analysis API
+that returns the first Fedelobo entertainment similarity result.
 
 Do not add business modules, databases, caches, server-side sessions,
 authentication frameworks, roles, production infrastructure, or speculative
@@ -77,6 +78,14 @@ dimension and pixel limits, requires exactly one usable face, and extracts a
 transient SFace embedding. OpenCV and ONNX Runtime model objects are initialized
 lazily and reused in-process; health-only startup must still work when model
 files are absent.
+
+Fedelobo-specific comparison stays outside the facial embedding engine. Runtime
+Fedelobo profile artifacts are external ignored biometric/reference material,
+not committed source assets. A valid profile must contain at least three finite
+SFace reference embeddings with the expected dimension. The user-facing
+percentage is a deterministic entertainment application score, not identity
+probability, proof of identity, biometric authentication, or scientific
+confidence.
 
 Do not add authentication, authorization, accounts, sessions, persistent visitor
 records, browser fingerprinting, or protected resources without an approved

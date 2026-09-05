@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import com.gerardoicu.lookalike.api.ErrorCode;
+import com.gerardoicu.lookalike.fedelobo.FedeloboAnalysisResult;
 import com.gerardoicu.lookalike.security.AnonymousAnalysisAuthorization;
 import com.gerardoicu.lookalike.security.AnonymousAnalysisSecurityGate;
 import jakarta.servlet.http.HttpServletResponse;
@@ -37,9 +38,9 @@ class FacialAnalysisController {
 	) {
 		AnonymousAnalysisAuthorization authorization = securityGate.authorizePreAnalysis(request, response, turnstileToken);
 		MultipartFile image = requiredSingleImage(request);
-		facialAnalysisService.analyze(bytesOf(image));
+		FedeloboAnalysisResult result = facialAnalysisService.analyze(bytesOf(image));
 		securityGate.recordSuccessfulAnalysis(response, authorization);
-		return ResponseEntity.ok(new FacialAnalysisResponse(true));
+		return ResponseEntity.ok(FacialAnalysisResponse.from(result));
 	}
 
 	private static MultipartFile requiredSingleImage(MultipartHttpServletRequest request) {

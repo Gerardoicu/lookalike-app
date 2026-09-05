@@ -22,5 +22,6 @@ backend/target/
 backend/.mvn/wrapper/maven-wrapper.jar
 backend/HELP.md
 backend/src/test/resources/ai-001/local/
+backend/src/test/resources/fedelobo/local/
 
 *.log

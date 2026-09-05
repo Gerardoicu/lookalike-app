@@ -8,7 +8,7 @@ public class FaceAnalysisException extends RuntimeException {
 	private final ErrorCode errorCode;
 	private final HttpStatus status;
 
-	FaceAnalysisException(ErrorCode errorCode, HttpStatus status, String message) {
+	public FaceAnalysisException(ErrorCode errorCode, HttpStatus status, String message) {
 		super(message);
 		this.errorCode = errorCode;
 		this.status = status;

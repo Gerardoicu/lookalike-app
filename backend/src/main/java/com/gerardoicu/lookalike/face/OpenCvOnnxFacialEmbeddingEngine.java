@@ -23,7 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-class OpenCvOnnxFacialEmbeddingEngine implements FacialEmbeddingEngine {
+public class OpenCvOnnxFacialEmbeddingEngine implements FacialEmbeddingEngine {
 
 	private static final String DETECTOR_MODEL = "face_detection_yunet_2023mar.onnx";
 	private static final String RECOGNIZER_MODEL = "face_recognition_sface_2021dec.onnx";
@@ -32,7 +32,7 @@ class OpenCvOnnxFacialEmbeddingEngine implements FacialEmbeddingEngine {
 	private final FaceAnalysisProperties properties;
 	private EngineState state;
 
-	OpenCvOnnxFacialEmbeddingEngine(FaceAnalysisProperties properties) {
+	public OpenCvOnnxFacialEmbeddingEngine(FaceAnalysisProperties properties) {
 		this.properties = properties;
 	}
 

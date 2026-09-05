@@ -8,6 +8,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.gerardoicu.lookalike.api.ApiExceptionHandler;
+import com.gerardoicu.lookalike.api.ErrorCode;
+import com.gerardoicu.lookalike.fedelobo.FedeloboAnalysisResult;
+import com.gerardoicu.lookalike.fedelobo.FedeloboSimilarityLevel;
 import com.gerardoicu.lookalike.security.AnonymousAnalysisSecurityGate;
 import com.gerardoicu.lookalike.security.AnonymousVisitorCookieService;
 import com.gerardoicu.lookalike.security.InMemoryFixedWindowRateLimiter;
@@ -63,6 +66,7 @@ class FacialAnalysisControllerTests {
 	void resetHarness() {
 		TestFaceConfiguration.analysisCalls = 0;
 		TestFaceConfiguration.failAnalysis = false;
+		TestFaceConfiguration.failFedelobo = false;
 	}
 
 	@Test
@@ -72,6 +76,9 @@ class FacialAnalysisControllerTests {
 				.header("X-Turnstile-Token", "valid"))
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.successful").value(true))
+			.andExpect(jsonPath("$.similarityPercentage").value(31))
+			.andExpect(jsonPath("$.level").value("LOW"))
+			.andExpect(jsonPath("$.phrase").value("A light Fedelobo resemblance showed up."))
 			.andExpect(header().exists(HttpHeaders.SET_COOKIE))
 			.andExpect(cookie().httpOnly(VISITOR_COOKIE, true));
 
@@ -112,6 +119,18 @@ class FacialAnalysisControllerTests {
 	}
 
 	@Test
+	void failedFedeloboResultDoesNotRecordCooldownCookie() throws Exception {
+		TestFaceConfiguration.failFedelobo = true;
+
+		mockMvc.perform(multipart(ENDPOINT)
+				.file(jpegFile())
+				.header("X-Turnstile-Token", "valid"))
+			.andExpect(status().isServiceUnavailable())
+			.andExpect(jsonPath("$.code").value("FEDELOBO_PROFILE_UNAVAILABLE"))
+			.andExpect(header().doesNotExist(HttpHeaders.SET_COOKIE));
+	}
+
+	@Test
 	void activeCooldownRejectsBeforeAnalysis() throws Exception {
 		MvcResult first = mockMvc.perform(multipart(ENDPOINT)
 				.file(jpegFile())
@@ -141,15 +160,21 @@ class FacialAnalysisControllerTests {
 
 		static int analysisCalls;
 		static boolean failAnalysis;
+		static boolean failFedelobo;
 
 		@Bean
 		FacialAnalysisService facialAnalysisService() {
 			return new FacialAnalysisService(new UploadedImageValidator(new FaceAnalysisProperties(1_024 * 1_024, 1_024, 1_024, 1_048_576, 320, 0.9f, "")), image -> {
 				analysisCalls++;
 				if (failAnalysis) {
-					throw new FaceAnalysisException(com.gerardoicu.lookalike.api.ErrorCode.FACE_NO_USABLE_FACE, org.springframework.http.HttpStatus.BAD_REQUEST, "No usable face was detected.");
+					throw new FaceAnalysisException(ErrorCode.FACE_NO_USABLE_FACE, org.springframework.http.HttpStatus.BAD_REQUEST, "No usable face was detected.");
 				}
 				return new FacialEmbedding(new float[128]);
+			}, embedding -> {
+				if (failFedelobo) {
+					throw new FaceAnalysisException(ErrorCode.FEDELOBO_PROFILE_UNAVAILABLE, org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "Fedelobo profile is unavailable.");
+				}
+				return new FedeloboAnalysisResult(31, FedeloboSimilarityLevel.LOW, "A light Fedelobo resemblance showed up.");
 			});
 		}
 
