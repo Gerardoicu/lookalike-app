@@ -15,19 +15,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
-class UploadedImageValidator {
+public class UploadedImageValidator {
 
 	private static final int JPEG_MARKER_PREFIX = 0xFF;
 	private static final int JPEG_START_OF_IMAGE = 0xD8;
 
 	private final FaceAnalysisProperties properties;
 
-	UploadedImageValidator(FaceAnalysisProperties properties) {
+	public UploadedImageValidator(FaceAnalysisProperties properties) {
 		this.properties = properties;
 		ImageIO.setUseCache(false);
 	}
 
-	DecodedImage validate(byte[] bytes) {
+	public DecodedImage validate(byte[] bytes) {
 		if (bytes.length == 0) {
 			throw invalid(ErrorCode.FACE_IMAGE_EMPTY, HttpStatus.BAD_REQUEST, "Uploaded image is empty.");
 		}

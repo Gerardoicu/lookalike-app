@@ -1,6 +1,6 @@
 package com.gerardoicu.lookalike.face;
 
-interface FacialEmbeddingEngine {
+public interface FacialEmbeddingEngine {
 
 	FacialEmbedding extractEmbedding(DecodedImage image);
 }

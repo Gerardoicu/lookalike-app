@@ -109,6 +109,7 @@ is enabled:
 - `LOOKALIKE_VISITOR_COOKIE_MAX_AGE`
 - `LOOKALIKE_ANALYSIS_COOLDOWN`
 - `LOOKALIKE_AI_MODEL_DIR`
+- `LOOKALIKE_FEDELOBO_PROFILE_PATH`
 - `LOOKALIKE_FACE_MAX_IMAGE_BYTES`
 - `LOOKALIKE_FACE_MAX_WIDTH`
 - `LOOKALIKE_FACE_MAX_HEIGHT`
@@ -128,9 +129,12 @@ must remain backend-only.
 
 ## Local facial analysis check
 
-FACE-001 adds `POST /api/v1/facial-analyses` for one transient JPEG upload.
+`POST /api/v1/facial-analyses` accepts one transient JPEG upload and returns a
+Fedelobo entertainment similarity result.
 Uploaded photos are validated and processed in memory only. They are not written
 to databases, filesystem storage, object storage, logs, or analysis history.
+The percentage is an application score only. It is not identity probability,
+proof of identity, biometric authentication, or scientific confidence.
 
 Download the AI-001 model files into the ignored local model directory described
 in `docs/ai-001-facial-similarity-engine.md`, then run the backend with
@@ -143,6 +147,7 @@ $env:LOOKALIKE_TURNSTILE_SECRET_KEY="1x0000000000000000000000000000000AA"
 $env:LOOKALIKE_TURNSTILE_EXPECTED_HOSTNAMES="example.com"
 $env:LOOKALIKE_TURNSTILE_EXPECTED_ACTION=""
 $env:LOOKALIKE_AI_MODEL_DIR=(Resolve-Path "src\test\resources\ai-001\local\models").Path
+$env:LOOKALIKE_FEDELOBO_PROFILE_PATH=(Join-Path (Resolve-Path "src\test\resources\ai-001\local").Path "fedelobo-profile.json")
 .\mvnw.cmd spring-boot:run
 ```
 
@@ -157,11 +162,35 @@ curl.exe -i -X POST "http://localhost:8080/api/v1/facial-analyses" `
   -F "image=@C:\path\one-face.jpg;type=image/jpeg"
 ```
 
-A valid one-face image returns `{"successful":true}` and sets the anonymous
-visitor cookie. Corrupt images return `FACE_IMAGE_CORRUPT`, no-face images
-return `FACE_NO_USABLE_FACE`, multiple-face images return
-`FACE_MULTIPLE_USABLE_FACES`, and an immediate repeat with the returned cookie
-returns `SECURITY_COOLDOWN_ACTIVE`.
+A valid one-face image returns `successful`, `similarityPercentage`, `level`,
+and `phrase`, then sets the anonymous visitor cookie. Corrupt images return
+`FACE_IMAGE_CORRUPT`, no-face images return `FACE_NO_USABLE_FACE`,
+multiple-face images return `FACE_MULTIPLE_USABLE_FACES`, missing profile
+configuration returns `FEDELOBO_PROFILE_UNAVAILABLE`, and an immediate repeat
+with the returned cookie returns `SECURITY_COOLDOWN_ACTIVE`.
+
+Generate the local ignored Fedelobo profile from local reference JPEGs before
+running the endpoint:
+
+```powershell
+$assetDir = (Resolve-Path "backend\src\test\resources\ai-001\local").Path
+$referenceDir = (Resolve-Path "backend\src\test\resources\ai-001\local\reference").Path
+$outputDir = (Resolve-Path "backend\src\test\resources\ai-001\local").Path
+$outputProfile = Join-Path $outputDir "fedelobo-profile.json"
+
+$env:AI001_ASSET_DIR = $assetDir
+$env:FEDELOBO_REFERENCE_DIR = $referenceDir
+$env:FEDELOBO_PROFILE_PATH = $outputProfile
+
+Set-Location backend
+.\mvnw.cmd -Dtest=FedeloboReferenceProfileLocalTests test
+```
+
+Fedelobo reference photos and generated profile artifacts are local-only
+biometric/reference material and must not be committed. Public visibility of
+source photos does not grant redistribution or commercial rights. Fedelobo
+reference-material rights and COMPLIANCE-001 remain public monetized-production
+release blockers.
 
 ## Test
 

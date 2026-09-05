@@ -2,6 +2,7 @@ package com.gerardoicu.lookalike.api;
 
 public enum ErrorCode {
 
+	FEDELOBO_PROFILE_UNAVAILABLE,
 	FACE_ANALYSIS_UNAVAILABLE,
 	FACE_IMAGE_CORRUPT,
 	FACE_IMAGE_DIMENSIONS_UNSUPPORTED,

@@ -2,9 +2,9 @@ package com.gerardoicu.lookalike.face;
 
 import java.util.Arrays;
 
-record FacialEmbedding(float[] values) {
+public record FacialEmbedding(float[] values) {
 
-	FacialEmbedding {
+	public FacialEmbedding {
 		values = Arrays.copyOf(values, values.length);
 	}
 

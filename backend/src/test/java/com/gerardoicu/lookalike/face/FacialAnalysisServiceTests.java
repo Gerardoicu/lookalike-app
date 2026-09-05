@@ -1,9 +1,11 @@
 package com.gerardoicu.lookalike.face;
 
-import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.gerardoicu.lookalike.api.ErrorCode;
+import com.gerardoicu.lookalike.fedelobo.FedeloboAnalysisResult;
+import com.gerardoicu.lookalike.fedelobo.FedeloboSimilarityLevel;
 import org.junit.jupiter.api.Test;
 
 class FacialAnalysisServiceTests {
@@ -22,7 +24,8 @@ class FacialAnalysisServiceTests {
 	void validJpegWithOneUsableFaceSucceeds() {
 		FacialAnalysisService service = serviceWith(image -> new FacialEmbedding(new float[128]));
 
-		assertThatCode(() -> service.analyze(ImageTestData.jpeg(64, 64))).doesNotThrowAnyException();
+		assertThat(service.analyze(ImageTestData.jpeg(64, 64)))
+			.isEqualTo(new FedeloboAnalysisResult(31, FedeloboSimilarityLevel.LOW, "A light Fedelobo resemblance showed up."));
 	}
 
 	@Test
@@ -67,6 +70,9 @@ class FacialAnalysisServiceTests {
 				new UploadedImageValidator(new FaceAnalysisProperties(4, 1_024, 1_024, 1_048_576, 320, 0.9f, "")),
 				image -> {
 					throw new AssertionError("Face engine should not be called.");
+				},
+				embedding -> {
+					throw new AssertionError("Fedelobo service should not be called.");
 				}
 		);
 
@@ -82,6 +88,9 @@ class FacialAnalysisServiceTests {
 				new UploadedImageValidator(new FaceAnalysisProperties(1_024 * 1_024, 32, 32, 1_024, 320, 0.9f, "")),
 				image -> {
 					throw new AssertionError("Face engine should not be called.");
+				},
+				embedding -> {
+					throw new AssertionError("Fedelobo service should not be called.");
 				}
 		);
 
@@ -125,7 +134,27 @@ class FacialAnalysisServiceTests {
 			.isEqualTo(ErrorCode.FACE_ANALYSIS_UNAVAILABLE);
 	}
 
+	@Test
+	void fedeloboFailurePropagatesAfterEmbeddingExtraction() {
+		FacialAnalysisService service = new FacialAnalysisService(
+				new UploadedImageValidator(properties),
+				image -> new FacialEmbedding(new float[128]),
+				embedding -> {
+					throw new FaceAnalysisException(ErrorCode.FEDELOBO_PROFILE_UNAVAILABLE, org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "Fedelobo profile is unavailable.");
+				}
+		);
+
+		assertThatThrownBy(() -> service.analyze(ImageTestData.jpeg(64, 64)))
+			.isInstanceOf(FaceAnalysisException.class)
+			.extracting("errorCode")
+			.isEqualTo(ErrorCode.FEDELOBO_PROFILE_UNAVAILABLE);
+	}
+
 	private FacialAnalysisService serviceWith(FacialEmbeddingEngine engine) {
-		return new FacialAnalysisService(new UploadedImageValidator(properties), engine);
+		return new FacialAnalysisService(
+				new UploadedImageValidator(properties),
+				engine,
+				embedding -> new FedeloboAnalysisResult(31, FedeloboSimilarityLevel.LOW, "A light Fedelobo resemblance showed up.")
+		);
 	}
 }
