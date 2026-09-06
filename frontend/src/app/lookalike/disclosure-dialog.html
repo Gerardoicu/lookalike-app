@@ -1,0 +1,59 @@
+<h2 mat-dialog-title>Aviso de entretenimiento, uso de imagen y persona de referencia</h2>
+
+<mat-dialog-content class="disclosure-content">
+  <p>
+    Lookalike es una aplicación de entretenimiento. Los porcentajes y resultados de similitud se generan automáticamente
+    y tienen únicamente fines recreativos.
+  </p>
+
+  <p>
+    Los resultados no constituyen verificación de identidad, autenticación biométrica, prueba de identidad ni una
+    probabilidad científicamente validada de que seas la persona de referencia. Pueden ser imprecisos, inesperados o
+    incorrectos y no deben utilizarse para tomar decisiones legales, laborales, financieras, de seguridad o de cualquier
+    otra naturaleza importante.
+  </p>
+
+  <p>
+    Al continuar, aceptas que Lookalike procese temporalmente la imagen y las características faciales enviadas
+    únicamente con el fin de generar el resultado de similitud. Las fotografías, representaciones faciales y resultados
+    del visitante no se conservan como historial de análisis una vez finalizado el procesamiento.
+  </p>
+
+  <p>
+    Confirmas que tienes derecho o permiso para enviar la imagen utilizada y que su uso no vulnera los derechos de otra
+    persona.
+  </p>
+
+  <h3>Sobre la persona de referencia</h3>
+
+  <p>
+    Fedelobo se utiliza en Lookalike únicamente como referencia comparativa para una experiencia de entretenimiento.
+  </p>
+
+  <p>
+    Lookalike es un proyecto independiente y no está afiliado, patrocinado, autorizado ni respaldado por Fedelobo ni por
+    sus representantes, salvo que se indique expresamente lo contrario.
+  </p>
+
+  <p>
+    El uso de su nombre como referencia no implica que Fedelobo haya participado en el desarrollo de la aplicación,
+    revisado sus resultados, aprobado su funcionamiento o autorizado los porcentajes generados.
+  </p>
+
+  <p>
+    Los resultados de Lookalike son generados por el propio sistema y no pretenden identificar, autenticar, representar
+    oficialmente ni atribuir declaraciones, opiniones o conductas a la persona de referencia.
+  </p>
+
+  <p>
+    Al seleccionar “Entiendo y continuar”, confirmas que has leído y comprendido este aviso y aceptas continuar bajo
+    estas condiciones.
+  </p>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" [mat-dialog-close]="'declined'">Salir</button>
+  <button mat-flat-button type="button" [mat-dialog-close]="'accepted'" cdkFocusInitial>
+    Entiendo y continuar
+  </button>
+</mat-dialog-actions>

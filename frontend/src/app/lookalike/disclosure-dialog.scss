@@ -1,0 +1,27 @@
+.disclosure-content {
+  display: grid;
+  gap: 14px;
+  max-height: min(68vh, 620px);
+}
+
+.disclosure-content p,
+.disclosure-content h3 {
+  margin: 0;
+}
+
+.disclosure-content p {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.disclosure-content h3 {
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+  letter-spacing: 0;
+}
+
+@media (max-width: 600px) {
+  .disclosure-content {
+    max-height: 62vh;
+  }
+}

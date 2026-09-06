@@ -3,9 +3,14 @@ import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    sessionStorage.setItem('lookalike.disclosure.accepted', 'true');
     await TestBed.configureTestingModule({
       imports: [App]
     }).compileComponents();
+  });
+
+  afterEach(() => {
+    sessionStorage.clear();
   });
 
   it('renders the application shell', async () => {

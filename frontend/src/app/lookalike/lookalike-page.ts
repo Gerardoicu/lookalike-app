@@ -1,12 +1,15 @@
 import { NgClass } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subscription, timer } from 'rxjs';
 
 import { TurnstileWidget } from '../core/security/turnstile-widget';
+import { DisclosureAcknowledgement, DisclosureExitNavigation } from './disclosure-acknowledgement';
+import { DisclosureDialog } from './disclosure-dialog';
 import { ApiProblemDetail, FacialAnalysisApi, FacialAnalysisResult } from './facial-analysis-api';
 import {
   LOOKALIKE_FACE_REQUIREMENT,
@@ -53,12 +56,15 @@ const ERROR_MESSAGES: Record<string, string> = {
 
 @Component({
   selector: 'app-lookalike-page',
-  imports: [MatButtonModule, MatIconModule, MatProgressSpinnerModule, NgClass, TurnstileWidget],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatProgressSpinnerModule, NgClass, TurnstileWidget],
   templateUrl: './lookalike-page.html',
   styleUrl: './lookalike-page.scss'
 })
-export class LookalikePage implements OnDestroy {
+export class LookalikePage implements OnInit, OnDestroy {
   private readonly api = inject(FacialAnalysisApi);
+  private readonly dialog = inject(MatDialog);
+  private readonly disclosure = inject(DisclosureAcknowledgement);
+  private readonly disclosureExitNavigation = inject(DisclosureExitNavigation);
   readonly turnstileSiteKey = inject(LOOKALIKE_TURNSTILE_SITE_KEY);
   readonly turnstileAction = LOOKALIKE_TURNSTILE_ACTION;
   readonly maxImageBytes = LOOKALIKE_MAX_IMAGE_BYTES;
@@ -72,8 +78,10 @@ export class LookalikePage implements OnDestroy {
   readonly errorMessage = signal<string | null>(null);
   readonly result = signal<FacialAnalysisResult | null>(null);
   readonly cooldownRemainingSeconds = signal(0);
+  readonly disclosureAccepted = signal(this.disclosure.isAccepted());
 
   readonly canSubmit = computed(() =>
+    this.disclosureAccepted() &&
     this.selectedFile() !== null &&
     this.previewUrl() !== null &&
     this.turnstileToken() !== null &&
@@ -95,20 +103,34 @@ export class LookalikePage implements OnDestroy {
   @ViewChild(TurnstileWidget) private readonly turnstileWidget?: TurnstileWidget;
 
   private cooldownSubscription?: Subscription;
+  private disclosureSubscription?: Subscription;
   private selectionVersion = 0;
+
+  ngOnInit(): void {
+    if (!this.disclosureAccepted()) {
+      this.openDisclosure();
+    }
+  }
 
   ngOnDestroy(): void {
     this.revokePreview();
     this.cooldownSubscription?.unsubscribe();
+    this.disclosureSubscription?.unsubscribe();
   }
 
   selectFromInput(event: Event): void {
+    if (!this.disclosureAccepted()) {
+      return;
+    }
     const input = event.target as HTMLInputElement;
     void this.selectFiles(input.files);
   }
 
   selectFromDrop(event: DragEvent): void {
     event.preventDefault();
+    if (!this.disclosureAccepted()) {
+      return;
+    }
     void this.selectFiles(event.dataTransfer?.files ?? null);
   }
 
@@ -136,6 +158,9 @@ export class LookalikePage implements OnDestroy {
 
   submit(): void {
     if (this.state() === 'submitting') {
+      return;
+    }
+    if (!this.disclosureAccepted()) {
       return;
     }
     const file = this.selectedFile();
@@ -177,6 +202,9 @@ export class LookalikePage implements OnDestroy {
   }
 
   private async selectFiles(files: FileList | null): Promise<void> {
+    if (!this.disclosureAccepted()) {
+      return;
+    }
     const version = ++this.selectionVersion;
     this.result.set(null);
     this.errorMessage.set(null);
@@ -312,6 +340,25 @@ export class LookalikePage implements OnDestroy {
   private resetTurnstileAfterSubmittedRequest(): void {
     this.turnstileToken.set(null);
     this.turnstileWidget?.reset();
+  }
+
+  private openDisclosure(): void {
+    const reference = this.dialog.open(DisclosureDialog, {
+      autoFocus: 'first-tabbable',
+      disableClose: true,
+      maxWidth: '720px',
+      width: 'calc(100vw - 32px)'
+    });
+    this.disclosureSubscription = reference.afterClosed().subscribe((result: 'accepted' | 'declined' | undefined) => {
+      if (result === 'accepted') {
+        this.disclosure.accept();
+        this.disclosureAccepted.set(true);
+        return;
+      }
+      this.disclosure.decline();
+      this.disclosureAccepted.set(false);
+      this.disclosureExitNavigation.redirect();
+    });
   }
 
   private revokePreview(): void {

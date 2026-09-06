@@ -1,8 +1,13 @@
 import { HttpErrorResponse } from '@angular/common/http';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Observable, Subject, of, throwError } from 'rxjs';
 
 import { TurnstileApi, TurnstileRenderOptions } from '../core/security/turnstile';
+import {
+  DISCLOSURE_BROWSER_LOCATION,
+  DISCLOSURE_DECLINE_REDIRECT_URL
+} from './disclosure-acknowledgement';
 import { FacialAnalysisApi, FacialAnalysisResult } from './facial-analysis-api';
 import { LOOKALIKE_IMAGE_DIMENSIONS_UNSUPPORTED_MESSAGE, LOOKALIKE_IMAGE_OVERSIZED_MESSAGE, LOOKALIKE_TURNSTILE_SITE_KEY } from './lookalike-config';
 import { LookalikePage } from './lookalike-page';
@@ -35,6 +40,8 @@ describe('LookalikePage', () => {
   let fixture: ComponentFixture<LookalikePage>;
   let component: LookalikePage;
   let api: FacialAnalysisApiStub;
+  let browserLocation: { assign: ReturnType<typeof vi.fn> };
+  let overlayContainer: OverlayContainer;
   let createdUrls: string[];
   let revokedUrls: string[];
   let renderedOptions: TurnstileRenderOptions;
@@ -42,11 +49,13 @@ describe('LookalikePage', () => {
 
   beforeEach(async () => {
     api = new FacialAnalysisApiStub();
+    browserLocation = { assign: vi.fn() };
     createdUrls = [];
     revokedUrls = [];
     resetCalls = [];
     nextImageDimensions = { width: 1024, height: 768 };
     nextImageLoadFails = false;
+    sessionStorage.setItem('lookalike.disclosure.accepted', 'true');
     vi.spyOn(URL, 'createObjectURL').mockImplementation((file) => {
       const url = `blob:${(file as File).name}-${createdUrls.length}`;
       createdUrls.push(url);
@@ -68,10 +77,12 @@ describe('LookalikePage', () => {
       imports: [LookalikePage],
       providers: [
         { provide: FacialAnalysisApi, useValue: api },
+        { provide: DISCLOSURE_BROWSER_LOCATION, useValue: browserLocation },
         { provide: LOOKALIKE_TURNSTILE_SITE_KEY, useValue: 'site-key' }
       ]
     }).compileComponents();
 
+    overlayContainer = TestBed.inject(OverlayContainer);
     fixture = TestBed.createComponent(LookalikePage);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -82,7 +93,42 @@ describe('LookalikePage', () => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
     vi.useRealTimers();
+    sessionStorage.clear();
+    overlayContainer.ngOnDestroy();
     delete window.turnstile;
+  });
+
+  it('shows the disclosure before the analysis flow is usable', async () => {
+    await recreateWithoutDisclosureAcceptance();
+
+    expect(overlayText()).toContain('Aviso de entretenimiento, uso de imagen y persona de referencia');
+    expect(overlayText()).toContain('Entiendo y continuar');
+    expect(overlayText()).toContain('Salir');
+    expect(fixture.nativeElement.querySelector('#photo-input')).toBeNull();
+    expect(component.canSubmit()).toBe(false);
+  });
+
+  it('accepting the disclosure enables the normal flow for the session', async () => {
+    await recreateWithoutDisclosureAcceptance();
+
+    await closeDisclosure('Entiendo y continuar');
+
+    expect(component.disclosureAccepted()).toBe(true);
+    expect(sessionStorage.getItem('lookalike.disclosure.accepted')).toBe('true');
+    expect(fixture.nativeElement.querySelector('#photo-input')).not.toBeNull();
+    expect(browserLocation.assign).not.toHaveBeenCalled();
+  });
+
+  it('declining the disclosure does not acknowledge and redirects away', async () => {
+    await recreateWithoutDisclosureAcceptance();
+
+    await closeDisclosure('Salir');
+
+    expect(component.disclosureAccepted()).toBe(false);
+    expect(sessionStorage.getItem('lookalike.disclosure.accepted')).toBeNull();
+    expect(fixture.nativeElement.querySelector('#photo-input')).toBeNull();
+    expect(component.canSubmit()).toBe(false);
+    expect(browserLocation.assign).toHaveBeenCalledWith(DISCLOSURE_DECLINE_REDIRECT_URL);
   });
 
   it('starts in the initial state', () => {
@@ -372,6 +418,37 @@ describe('LookalikePage', () => {
   function text(): string {
     fixture.detectChanges();
     return (fixture.nativeElement as HTMLElement).textContent ?? '';
+  }
+
+  function overlayText(): string {
+    return overlayContainer.getContainerElement().textContent ?? '';
+  }
+
+  function overlayButton(label: string): HTMLButtonElement {
+    const buttons = Array.from(overlayContainer.getContainerElement().querySelectorAll('button'));
+    const button = buttons.find((candidate) => candidate.textContent?.includes(label));
+    if (!button) {
+      throw new Error(`Could not find overlay button: ${label}`);
+    }
+    return button;
+  }
+
+  async function recreateWithoutDisclosureAcceptance(): Promise<void> {
+    fixture.destroy();
+    overlayContainer.ngOnDestroy();
+    sessionStorage.clear();
+    fixture = TestBed.createComponent(LookalikePage);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  async function closeDisclosure(label: string): Promise<void> {
+    overlayButton(label).dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    fixture.detectChanges();
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    fixture.detectChanges();
+    await fixture.whenStable();
   }
 });
 
