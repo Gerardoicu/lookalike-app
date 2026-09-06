@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { TurnstileApi, TurnstileRenderOptions } from './turnstile';
@@ -10,22 +10,26 @@ import { TurnstileWidget } from './turnstile-widget';
 })
 class TurnstileHost {
   token: string | null = null;
+
+  @ViewChild(TurnstileWidget) widget?: TurnstileWidget;
 }
 
 describe('TurnstileWidget', () => {
   let fixture: ComponentFixture<TurnstileHost>;
   let renderedOptions: TurnstileRenderOptions;
   let removeCalls: string[];
+  let resetCalls: string[];
 
   beforeEach(async () => {
     removeCalls = [];
+    resetCalls = [];
     window.turnstile = {
       render: (_container: HTMLElement, options: TurnstileRenderOptions) => {
         renderedOptions = options;
         return 'widget-id';
       },
       remove: (widgetId: string) => removeCalls.push(widgetId),
-      reset: () => undefined
+      reset: (widgetId: string) => resetCalls.push(widgetId)
     } satisfies TurnstileApi;
 
     await TestBed.configureTestingModule({
@@ -62,5 +66,15 @@ describe('TurnstileWidget', () => {
     fixture.destroy();
 
     expect(removeCalls).toEqual(['widget-id']);
+  });
+
+  it('resets widget and clears token when requested', () => {
+    renderedOptions.callback?.('turnstile-token');
+    expect(fixture.componentInstance.token).toBe('turnstile-token');
+
+    fixture.componentInstance.widget?.reset();
+
+    expect(resetCalls).toEqual(['widget-id']);
+    expect(fixture.componentInstance.token).toBeNull();
   });
 });

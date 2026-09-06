@@ -1,0 +1,112 @@
+<section class="experience" aria-labelledby="lookalike-title">
+  <div class="intro">
+    <p class="eyebrow">Fedelobo lookalike test</p>
+    <h1 id="lookalike-title">How Fedelobo is your face?</h1>
+    <p class="disclaimer">
+      This score is for entertainment only. It is not proof of identity, identity probability, or biometric authentication.
+    </p>
+  </div>
+
+  <div class="workbench">
+    <section
+      class="picker"
+      [class.has-preview]="previewUrl()"
+      aria-labelledby="photo-title"
+      (drop)="selectFromDrop($event)"
+      (dragover)="allowDrop($event)"
+    >
+      <div class="picker-copy">
+        <mat-icon aria-hidden="true">add_photo_alternate</mat-icon>
+        <h2 id="photo-title">Choose one JPEG photo</h2>
+        <p>Use a clear picture with one visible face.</p>
+      </div>
+
+      <input
+        #fileInput
+        id="photo-input"
+        class="file-input"
+        type="file"
+        accept="image/jpeg,.jpg,.jpeg"
+        aria-describedby="photo-help"
+        (change)="selectFromInput($event)"
+      />
+      <label class="file-label" for="photo-input">Select photo</label>
+      <p id="photo-help" class="photo-help">
+        <span>{{ imageRequirements }}</span>
+        <span>{{ faceRequirement }}</span>
+      </p>
+
+      @if (previewUrl(); as preview) {
+        <figure class="preview">
+          <img [src]="preview" [alt]="'Selected photo preview: ' + (selectedFile()?.name ?? 'image')" />
+          <figcaption>{{ selectedFile()?.name }}</figcaption>
+        </figure>
+        <button mat-button type="button" (click)="clearSelection()">
+          <mat-icon aria-hidden="true">close</mat-icon>
+          Replace photo
+        </button>
+      }
+    </section>
+
+    <section class="analysis-panel" aria-labelledby="analysis-title">
+      <h2 id="analysis-title">Analysis</h2>
+      <app-turnstile-widget
+        [siteKey]="turnstileSiteKey"
+        [action]="turnstileAction"
+        (tokenChange)="handleTokenChange($event)"
+      />
+
+      <button
+        mat-flat-button
+        class="analyze-button"
+        type="button"
+        [disabled]="!canSubmit()"
+        (click)="submit()"
+      >
+        <span class="button-content">
+          @if (state() === 'submitting') {
+            <mat-spinner diameter="20" aria-hidden="true" />
+            Analyzing
+          } @else {
+            <mat-icon aria-hidden="true">face</mat-icon>
+            Analyze
+          }
+        </span>
+      </button>
+
+      <div class="status" aria-live="polite" aria-atomic="true">
+        @if (statusMessage()) {
+          <p>{{ statusMessage() }}</p>
+        } @else if (!selectedFile()) {
+          <p>Select a JPEG photo to begin.</p>
+        } @else if (!turnstileToken()) {
+          <p>Complete verification to continue.</p>
+        } @else {
+          <p>Ready to analyze.</p>
+        }
+      </div>
+
+      @if (result(); as analysisResult) {
+        <section class="result" aria-labelledby="result-title">
+          <p id="result-title" class="result-label">Fedelobo similarity</p>
+          <p class="percentage">{{ analysisResult.similarityPercentage }}%</p>
+          <p class="phrase">{{ analysisResult.phrase }}</p>
+          <p class="level" [ngClass]="'level-' + analysisResult.level.toLowerCase()">
+            Level: {{ analysisResult.level }}
+          </p>
+          <button mat-button type="button" (click)="resetAttempt()">
+            <mat-icon aria-hidden="true">refresh</mat-icon>
+            Try another result
+          </button>
+        </section>
+      }
+
+      @if (state() === 'cooldown') {
+        <section class="cooldown" aria-labelledby="cooldown-title">
+          <h3 id="cooldown-title">Cooldown active</h3>
+          <p>{{ cooldownRemainingSeconds() }} seconds remaining.</p>
+        </section>
+      }
+    </section>
+  </div>
+</section>

@@ -1,0 +1,267 @@
+:host {
+  display: block;
+}
+
+.experience {
+  min-height: calc(100dvh - 64px);
+  padding: 40px 24px 56px;
+  background:
+    linear-gradient(135deg, rgba(17, 97, 73, 0.12), transparent 34%),
+    linear-gradient(315deg, rgba(176, 49, 36, 0.12), transparent 30%),
+    var(--mat-sys-surface);
+}
+
+.intro,
+.workbench {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.intro {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.eyebrow,
+.disclaimer,
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+.eyebrow {
+  color: #116149;
+  font: var(--mat-sys-label-large);
+  text-transform: uppercase;
+}
+
+h1 {
+  max-width: 760px;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-display-medium);
+  letter-spacing: 0;
+}
+
+.disclaimer {
+  max-width: 760px;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-large);
+}
+
+.workbench {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.picker,
+.analysis-panel {
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--mat-sys-surface) 94%, white);
+  box-shadow: 0 18px 50px rgba(27, 31, 35, 0.08);
+}
+
+.picker {
+  display: grid;
+  gap: 18px;
+  min-height: 560px;
+  padding: 28px;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  border-style: dashed;
+}
+
+.picker.has-preview {
+  align-content: start;
+}
+
+.picker-copy {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+}
+
+.picker-copy mat-icon {
+  width: 48px;
+  height: 48px;
+  color: #b03124;
+  font-size: 48px;
+}
+
+h2 {
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-headline-small);
+  letter-spacing: 0;
+}
+
+.picker-copy p,
+.photo-help,
+.status p,
+.cooldown p {
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.photo-help {
+  display: grid;
+  gap: 4px;
+}
+
+.file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.file-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 6px;
+  background: #116149;
+  color: white;
+  cursor: pointer;
+  font: var(--mat-sys-label-large);
+}
+
+.file-input:focus-visible + .file-label,
+.file-label:hover {
+  outline: 3px solid rgba(17, 97, 73, 0.28);
+  outline-offset: 3px;
+}
+
+.preview {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  margin: 0;
+}
+
+.preview img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #111;
+}
+
+.preview figcaption {
+  overflow-wrap: anywhere;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-small);
+}
+
+.analysis-panel {
+  display: grid;
+  gap: 18px;
+  padding: 28px;
+}
+
+.analysis-panel h2 {
+  font: var(--mat-sys-title-large);
+}
+
+.analyze-button {
+  min-height: 48px;
+}
+
+.button-content {
+  display: inline-flex;
+  align-items: center;
+}
+
+.button-content mat-spinner,
+.button-content mat-icon {
+  margin-right: 8px;
+}
+
+.status,
+.cooldown,
+.result {
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.status {
+  background: var(--mat-sys-surface-container-low);
+}
+
+.result {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(17, 97, 73, 0.22);
+  background: rgba(17, 97, 73, 0.08);
+}
+
+.result-label {
+  color: #116149;
+  font: var(--mat-sys-label-large);
+  text-transform: uppercase;
+}
+
+.percentage {
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-display-large);
+  letter-spacing: 0;
+}
+
+.phrase {
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-title-medium);
+}
+
+.level {
+  width: fit-content;
+  border-radius: 6px;
+  padding: 4px 8px;
+  background: rgba(176, 49, 36, 0.12);
+  color: #6f2119;
+  font: var(--mat-sys-label-large);
+}
+
+.cooldown {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(176, 49, 36, 0.24);
+  background: rgba(176, 49, 36, 0.08);
+}
+
+.cooldown h3 {
+  color: #6f2119;
+  font: var(--mat-sys-title-medium);
+  letter-spacing: 0;
+}
+
+@media (max-width: 840px) {
+  .experience {
+    min-height: calc(100dvh - 56px);
+    padding: 28px 16px 40px;
+  }
+
+  h1 {
+    font: var(--mat-sys-display-small);
+  }
+
+  .workbench {
+    grid-template-columns: 1fr;
+  }
+
+  .picker {
+    min-height: auto;
+    padding: 22px;
+  }
+
+  .analysis-panel {
+    padding: 22px;
+  }
+}
