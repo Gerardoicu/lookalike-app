@@ -127,6 +127,12 @@ Do not commit real secret values. Cloudflare Turnstile site keys are public
 client configuration; Turnstile secret keys and visitor-cookie signing secrets
 must remain backend-only.
 
+The Angular app passes the public Turnstile site key into the reusable
+`app-turnstile-widget`. The committed local development site key is
+Cloudflare's visible always-pass test key:
+`1x00000000000000000000AA`. Replace it with the real public site key for
+production while keeping the backend secret external.
+
 ## Local facial analysis check
 
 `POST /api/v1/facial-analyses` accepts one transient JPEG upload and returns a
@@ -153,8 +159,11 @@ $env:LOOKALIKE_FEDELOBO_PROFILE_PATH=(Join-Path (Resolve-Path "src\test\resource
 
 Send one JPEG using Cloudflare's dummy token. Cloudflare's dummy Siteverify
 response uses the test hostname `example.com`; for localhost widget testing,
-configure the expected hostname as `localhost` and submit a real widget token
-instead.
+verify the hostname returned by Siteverify and configure only the local
+development expected hostname accordingly. Keep `LOOKALIKE_TURNSTILE_EXPECTED_ACTION`
+empty for local test-key browser checks unless the actual test response includes
+the production action. Submit a real widget token instead of the curl dummy
+token.
 
 ```powershell
 curl.exe -i -X POST "http://localhost:8080/api/v1/facial-analyses" `
@@ -191,6 +200,44 @@ biometric/reference material and must not be committed. Public visibility of
 source photos does not grant redistribution or commercial rights. Fedelobo
 reference-material rights and COMPLIANCE-001 remain public monetized-production
 release blockers.
+
+Do not regenerate `fedelobo-profile.json` as part of WEB-001 browser or detector
+tolerance checks. If the Fedelobo reference profile is regenerated after
+changing detector tolerance, FEDELOBO calibration must be revalidated because
+the accepted reference set may change.
+
+## Local browser analysis check
+
+The browser flow uses the existing Angular development proxy. Frontend code
+calls the relative `/api/v1/facial-analyses` URL with credentials; the proxy
+forwards `/api` to `http://localhost:8080`. No local CORS change is required.
+
+Start the backend from IntelliJ with local test configuration:
+
+```powershell
+LOOKALIKE_VISITOR_COOKIE_SIGNING_SECRET=local-dev-secret-with-enough-entropy
+LOOKALIKE_TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+LOOKALIKE_TURNSTILE_EXPECTED_HOSTNAMES=<actual-local-test-hostname-from-siteverify>
+LOOKALIKE_TURNSTILE_EXPECTED_ACTION=
+LOOKALIKE_AI_MODEL_DIR=C:\Users\Xerardo.DESKTOP-5CA4NBT\Documents\lookalike-app\backend\src\test\resources\ai-001\local\models
+LOOKALIKE_FEDELOBO_PROFILE_PATH=C:\Users\Xerardo.DESKTOP-5CA4NBT\Documents\lookalike-app\backend\src\test\resources\ai-001\local\fedelobo-profile.json
+```
+
+For production, use the real Turnstile site key, real backend secret, real
+expected hostname, and `LOOKALIKE_TURNSTILE_EXPECTED_ACTION=analysis`.
+
+Run Angular locally:
+
+```powershell
+Set-Location C:\Users\Xerardo.DESKTOP-5CA4NBT\Documents\lookalike-app\frontend
+npm.cmd start
+```
+
+Open `http://localhost:4200`, select `C:\gera.jpg`, complete Turnstile, and
+click Analyze. With the current local Fedelobo profile calibration, the result
+should be approximately `31%`, `LOW`, plus the backend-selected phrase. A second
+analysis request after obtaining a fresh Turnstile token should return the
+backend cooldown and show the countdown.
 
 ## Test
 

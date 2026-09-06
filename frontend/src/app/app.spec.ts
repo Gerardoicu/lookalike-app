@@ -10,10 +10,11 @@ describe('App', () => {
 
   it('renders the application shell', async () => {
     const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
     await fixture.whenStable();
     const compiled = fixture.nativeElement as HTMLElement;
 
     expect(compiled.querySelector('mat-toolbar')?.textContent).toContain('Lookalike');
-    expect(compiled.querySelector('h1')?.textContent).toContain('Lookalike');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Fedelobo');
   });
 });

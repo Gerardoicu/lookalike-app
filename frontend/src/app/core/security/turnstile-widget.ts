@@ -45,4 +45,11 @@ export class TurnstileWidget implements AfterViewInit, OnDestroy {
       window.turnstile.remove(this.widgetId);
     }
   }
+
+  reset(): void {
+    if (this.widgetId && window.turnstile) {
+      window.turnstile.reset(this.widgetId);
+    }
+    this.tokenChange.emit(null);
+  }
 }

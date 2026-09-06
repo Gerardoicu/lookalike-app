@@ -19,7 +19,7 @@ public record FaceAnalysisProperties(
 		maxHeight = maxHeight <= 0 ? 4_096 : maxHeight;
 		maxPixels = maxPixels <= 0 ? 12_000_000L : maxPixels;
 		detectorInputSize = detectorInputSize <= 0 ? 320 : detectorInputSize;
-		minFaceConfidence = minFaceConfidence <= 0 ? 0.9f : minFaceConfidence;
+		minFaceConfidence = minFaceConfidence <= 0 ? 0.8f : minFaceConfidence;
 		modelDirectory = modelDirectory == null ? "" : modelDirectory;
 	}
 }
